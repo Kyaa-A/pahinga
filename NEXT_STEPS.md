@@ -2,9 +2,14 @@
 
 This guide provides step-by-step instructions to get your Horizon Sentinel project up and running, starting from your current state.
 
+**📊 PROGRESS: Steps 1-9 ✅ COMPLETED | Steps 10+ ⏭️ NEXT**
+
 ---
 
-## Phase 1: Basic Environment Setup (Tasks HS-DB-001 and HS-DB-002)
+## ✅ Phase 1: Basic Environment Setup (COMPLETED)
+
+**Tasks:** HS-DB-001 and HS-DB-002
+**Status:** ✅ Done - Skip to Phase 3!
 
 ### Step 1: Install Composer Dependencies
 
@@ -95,7 +100,10 @@ This creates the default Laravel tables including `users`.
 
 ---
 
-## Phase 2: Install Authentication (Task HS-AUTH-001)
+## ✅ Phase 2: Install Authentication (COMPLETED)
+
+**Tasks:** HS-AUTH-001, HS-AUTH-002
+**Status:** ✅ Done - Skip to Phase 3!
 
 ### Step 6: Install Laravel Breeze
 
@@ -151,7 +159,19 @@ Visit `http://localhost:8000` in your browser. You should see:
 
 ---
 
-## Phase 3: Extend User Model (Task HS-AUTH-003 & HS-DB-003)
+---
+---
+---
+
+# 👉 START HERE! Phase 3: Extend User Model
+
+**Tasks:** HS-AUTH-003 & HS-DB-003
+**Status:** 🔄 IN PROGRESS - This is your next step!
+**Time:** ~30 minutes
+
+---
+---
+---
 
 ### Step 10: Create Migration for User Extensions
 
@@ -277,7 +297,11 @@ class User extends Authenticatable
 
 ---
 
-## Phase 4: Create Leave Request Data Model (Tasks HS-DB-004, HS-DB-005)
+## ⏳ Phase 4: Create Leave Request Data Model
+
+**Tasks:** HS-DB-004, HS-DB-005
+**Status:** Not Started - Complete Phase 3 first
+**Time:** ~1-2 hours
 
 ### Step 13: Create LeaveRequest Migration
 
@@ -393,7 +417,11 @@ php artisan migrate
 
 ---
 
-## Phase 5: Create Models (Tasks HS-BE-001, HS-BE-002, HS-BE-003)
+## ⏳ Phase 5: Create Models
+
+**Tasks:** HS-BE-001, HS-BE-002, HS-BE-003
+**Status:** Not Started - Complete Phase 4 first
+**Time:** ~2-3 hours
 
 ### Step 16: Create LeaveRequest Model
 
@@ -570,7 +598,11 @@ class LeaveRequestHistory extends Model
 
 ---
 
-## Phase 6: Create Test Data (Task HS-BE-004)
+## ⏳ Phase 6: Create Test Data
+
+**Task:** HS-BE-004
+**Status:** Not Started - Complete Phase 5 first
+**Time:** ~30 minutes
 
 ### Step 18: Create Database Seeders
 
