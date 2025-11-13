@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\LeaveRequestController;
+use App\Http\Controllers\ManagerController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -20,6 +21,16 @@ Route::middleware('auth')->group(function () {
     // Leave Request routes
     Route::resource('leave-requests', LeaveRequestController::class)->except(['edit', 'update', 'destroy']);
     Route::post('leave-requests/{leave_request}/cancel', [LeaveRequestController::class, 'cancel'])->name('leave-requests.cancel');
+
+    // Manager routes
+    Route::prefix('manager')->name('manager.')->group(function () {
+        Route::get('/dashboard', [ManagerController::class, 'dashboard'])->name('dashboard');
+        Route::get('/pending-requests', [ManagerController::class, 'pendingRequests'])->name('pending-requests');
+        Route::get('/requests/{leave_request}', [ManagerController::class, 'showRequest'])->name('show-request');
+        Route::post('/requests/{leave_request}/approve', [ManagerController::class, 'approve'])->name('approve');
+        Route::post('/requests/{leave_request}/deny', [ManagerController::class, 'deny'])->name('deny');
+        Route::get('/team-calendar', [ManagerController::class, 'teamCalendar'])->name('team-calendar');
+    });
 });
 
 require __DIR__.'/auth.php';

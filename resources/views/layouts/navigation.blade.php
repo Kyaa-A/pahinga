@@ -18,6 +18,11 @@
                     <x-nav-link :href="route('leave-requests.index')" :active="request()->routeIs('leave-requests.*')">
                         {{ __('My Leave Requests') }}
                     </x-nav-link>
+                    @if (Auth::user()->isManager())
+                        <x-nav-link :href="route('manager.dashboard')" :active="request()->routeIs('manager.*')">
+                            {{ __('Manager Dashboard') }}
+                        </x-nav-link>
+                    @endif
                 </div>
             </div>
 
@@ -76,6 +81,11 @@
             <x-responsive-nav-link :href="route('leave-requests.index')" :active="request()->routeIs('leave-requests.*')">
                 {{ __('My Leave Requests') }}
             </x-responsive-nav-link>
+            @if (Auth::user()->isManager())
+                <x-responsive-nav-link :href="route('manager.dashboard')" :active="request()->routeIs('manager.*')">
+                    {{ __('Manager Dashboard') }}
+                </x-responsive-nav-link>
+            @endif
         </div>
 
         <!-- Responsive Settings Options -->
