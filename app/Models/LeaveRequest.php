@@ -54,6 +54,14 @@ class LeaveRequest extends Model
     }
 
     /**
+     * Alias for user() - get the employee who submitted the request.
+     */
+    public function employee(): BelongsTo
+    {
+        return $this->user();
+    }
+
+    /**
      * Get the manager who will review the request.
      */
     public function manager(): BelongsTo
@@ -146,6 +154,28 @@ class LeaveRequest extends Model
     public function isCancelled(): bool
     {
         return $this->status === 'cancelled';
+    }
+
+    /**
+     * Get the human-readable label for the leave type.
+     */
+    public function getLeaveTypeLabel(): string
+    {
+        return match ($this->leave_type) {
+            'paid_time_off' => 'Paid Time Off',
+            'unpaid_leave' => 'Unpaid Leave',
+            'sick_leave' => 'Sick Leave',
+            'vacation' => 'Vacation',
+            default => ucfirst(str_replace('_', ' ', $this->leave_type)),
+        };
+    }
+
+    /**
+     * Get the duration of the leave request in days.
+     */
+    public function getDurationAttribute(): int
+    {
+        return $this->start_date->diffInDays($this->end_date) + 1;
     }
 
     /**

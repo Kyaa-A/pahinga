@@ -98,6 +98,9 @@ class LeaveRequestController extends Controller
         // Record history
         $leaveRequest->recordHistory('submitted', $user->id, 'Leave request submitted');
 
+        // Notify manager
+        $user->manager->notify(new \App\Notifications\LeaveRequestSubmittedNotification($leaveRequest));
+
         return redirect()
             ->route('leave-requests.show', $leaveRequest)
             ->with('success', 'Your leave request has been submitted successfully!');
@@ -139,6 +142,9 @@ class LeaveRequestController extends Controller
             $request->user()->id,
             'Cancelled by employee'
         );
+
+        // Notify manager
+        $leaveRequest->manager->notify(new \App\Notifications\LeaveRequestCancelledNotification($leaveRequest));
 
         return redirect()
             ->route('leave-requests.index')

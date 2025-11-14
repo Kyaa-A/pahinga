@@ -160,6 +160,9 @@ class ManagerController extends Controller
             'Approved by manager'.($request->manager_notes ? ': '.$request->manager_notes : '')
         );
 
+        // Notify employee
+        $leaveRequest->employee->notify(new \App\Notifications\LeaveRequestApprovedNotification($leaveRequest));
+
         return redirect()
             ->route('manager.pending-requests')
             ->with('success', 'Leave request approved successfully!');
@@ -197,6 +200,9 @@ class ManagerController extends Controller
             $request->user()->id,
             'Denied by manager: '.$request->manager_notes
         );
+
+        // Notify employee
+        $leaveRequest->employee->notify(new \App\Notifications\LeaveRequestDeniedNotification($leaveRequest));
 
         return redirect()
             ->route('manager.pending-requests')
