@@ -1,5 +1,8 @@
 FROM php:8.3-cli
 
+# Cache bust - change this to force rebuild
+ARG CACHEBUST=2
+
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     git \
@@ -37,8 +40,10 @@ RUN npm ci && npm run build
 # Expose port
 EXPOSE 10000
 
-# Start script - cache config at runtime when env vars are available
-CMD php artisan config:cache && \
+# Start script - clear cache first, then cache config at runtime when env vars are available
+CMD php artisan config:clear && \
+    php artisan cache:clear && \
+    php artisan config:cache && \
     php artisan route:cache && \
     php artisan view:cache && \
     php artisan migrate --force && \
