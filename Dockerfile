@@ -17,18 +17,26 @@ COPY . .
 RUN composer dump-autoload --optimize --classmap-authoritative
 
 # Stage 3: Production image
-FROM dunglas/frankenphp:latest
+FROM php:8.3-cli-alpine
 
-# Install PHP extensions
-RUN install-php-extensions \
-    pdo_pgsql \
-    pgsql \
-    mbstring \
-    exif \
-    pcntl \
-    bcmath \
-    gd \
-    opcache
+# Install system dependencies
+RUN apk add --no-cache \
+    libpq \
+    libpng \
+    libjpeg-turbo \
+    freetype \
+    oniguruma
+
+# Install build dependencies, PHP extensions, then clean up
+RUN apk add --no-cache --virtual .build-deps \
+    postgresql-dev \
+    libpng-dev \
+    libjpeg-turbo-dev \
+    freetype-dev \
+    oniguruma-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) pdo pdo_pgsql pgsql mbstring exif pcntl bcmath gd opcache \
+    && apk del .build-deps
 
 # Copy OPcache configuration
 COPY docker/php/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
@@ -50,10 +58,6 @@ RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache \
 # Expose port
 EXPOSE 10000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:${PORT:-10000}/up || exit 1
-
 # Start script
 CMD php artisan config:clear && \
     php artisan cache:clear && \
@@ -62,4 +66,4 @@ CMD php artisan config:clear && \
     php artisan view:cache && \
     php artisan event:cache && \
     php artisan migrate --force && \
-    frankenphp php-server --listen=:${PORT:-10000} --root=/app/public
+    php artisan serve --host=0.0.0.0 --port=${PORT:-10000}
