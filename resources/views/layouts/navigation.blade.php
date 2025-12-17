@@ -5,7 +5,7 @@
             <div class="flex">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ Auth::user()->isHRAdmin() ? route('hr-admin.dashboard') : (Auth::user()->isManager() ? route('manager.dashboard') : route('dashboard')) }}" class="flex items-center space-x-3">
+                    <a wire:navigate href="{{ Auth::user()->isHRAdmin() ? route('hr-admin.dashboard') : (Auth::user()->isManager() ? route('manager.dashboard') : route('dashboard')) }}" class="flex items-center space-x-3">
                         <img src="{{ asset('pahinga.png') }}" alt="Pahinga" class="h-10 w-10">
                         <span class="text-2xl font-bold text-primary-800 dark:text-teal-400">Pahinga</span>
                     </a>
