@@ -24,11 +24,7 @@
         @livewireStyles
         <style>[x-cloak] { display: none !important; }</style>
     </head>
-    <body class="font-sans antialiased bg-gray-100 dark:bg-gray-900" x-data="{ loading: false }" @livewire-navigate-start.window="loading = true" @livewire-navigate-end.window="loading = false">
-        <!-- Loading indicator for page navigation -->
-        <div x-show="loading" x-cloak class="fixed top-0 left-0 right-0 z-50">
-            <div class="h-1 bg-gradient-horizon animate-pulse"></div>
-        </div>
+    <body class="font-sans antialiased bg-gray-100 dark:bg-gray-900">
         <div class="min-h-screen">
             @include('layouts.navigation')
 
