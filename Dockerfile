@@ -66,4 +66,5 @@ CMD php artisan config:clear && \
     php artisan view:cache && \
     php artisan event:cache && \
     php artisan migrate --force && \
+    if [ "$DB_SEED" = "true" ]; then php artisan db:seed --force; fi && \
     php artisan serve --host=0.0.0.0 --port=${PORT:-10000}
