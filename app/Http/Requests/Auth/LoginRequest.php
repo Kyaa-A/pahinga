@@ -49,6 +49,15 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        // Check if user account is deactivated
+        if (! Auth::user()->isActive()) {
+            Auth::logout();
+
+            throw ValidationException::withMessages([
+                'email' => 'Your account has been deactivated. Please contact HR.',
+            ]);
+        }
+
         RateLimiter::clear($this->throttleKey());
     }
 

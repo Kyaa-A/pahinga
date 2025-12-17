@@ -33,6 +33,11 @@
                         </span>
                         <span class="text-gray-400">•</span>
                         <span>Showing approved and pending leaves</span>
+                        <span class="text-gray-400">•</span>
+                        <span class="flex items-center">
+                            <span class="inline-block w-3 h-3 rounded bg-red-500 mr-1"></span>
+                            Holiday
+                        </span>
                     </div>
                 </div>
             </div>
@@ -73,27 +78,42 @@
                                 @php
                                     $isCurrentMonth = $currentDate->month === $currentMonth->month;
                                     $isToday = $currentDate->isToday();
+                                    $dateKey = $currentDate->format('Y-m-d');
+                                    $holiday = $holidays->get($dateKey);
                                     $leavesOnDay = $leaves->filter(function ($leave) use ($currentDate) {
                                         return $currentDate->between($leave->start_date, $leave->end_date);
                                     });
                                 @endphp
 
-                                <div class="bg-white dark:bg-gray-800 min-h-[110px] p-3 {{ !$isCurrentMonth ? 'opacity-40' : '' }} hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors">
-                                    <div class="text-sm font-semibold {{ $isToday ? 'inline-flex items-center justify-center w-7 h-7 rounded-full bg-primary-600 text-white' : 'text-gray-700 dark:text-gray-300' }}">
-                                        {{ $currentDate->day }}
+                                <div class="min-h-[110px] p-3 {{ !$isCurrentMonth ? 'opacity-40' : '' }} {{ $holiday ? 'bg-red-50 dark:bg-red-900/20' : 'bg-white dark:bg-gray-800' }} hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors">
+                                    <div class="flex items-center justify-between">
+                                        <div class="text-sm font-semibold {{ $isToday ? 'inline-flex items-center justify-center w-7 h-7 rounded-full bg-primary-600 text-white' : 'text-gray-700 dark:text-gray-300' }}">
+                                            {{ $currentDate->day }}
+                                        </div>
+                                        @if ($holiday)
+                                            <span class="inline-block w-2 h-2 rounded-full bg-red-500" title="{{ $holiday->name }}"></span>
+                                        @endif
                                     </div>
 
+                                    @if ($holiday)
+                                        <div class="mt-1">
+                                            <div title="{{ $holiday->name }}" class="text-xs px-2 py-1 rounded-md bg-red-200 text-red-800 dark:bg-red-800 dark:text-red-200 truncate font-medium">
+                                                {{ Str::limit($holiday->name, 15) }}
+                                            </div>
+                                        </div>
+                                    @endif
+
                                     @if ($leavesOnDay->isNotEmpty())
-                                        <div class="mt-2 space-y-1">
-                                            @foreach ($leavesOnDay->take(3) as $leave)
+                                        <div class="mt-1 space-y-1">
+                                            @foreach ($leavesOnDay->take($holiday ? 2 : 3) as $leave)
                                                 <div title="{{ $leave->user->name }} - {{ $leave->leave_type->label() }}"
                                                      class="text-xs px-2 py-1 rounded-md {{ $leave->status === \App\Enums\LeaveStatus::Approved ? 'bg-green-200 text-green-800 dark:bg-green-800 dark:text-green-200' : 'bg-yellow-200 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-200' }} truncate cursor-pointer hover:scale-105 transition-transform font-medium">
                                                     {{ substr($leave->user->name, 0, 12) }}{{ strlen($leave->user->name) > 12 ? '...' : '' }}
                                                 </div>
                                             @endforeach
-                                            @if ($leavesOnDay->count() > 3)
+                                            @if ($leavesOnDay->count() > ($holiday ? 2 : 3))
                                                 <div class="text-xs text-gray-600 dark:text-gray-400 italic font-medium px-1">
-                                                    +{{ $leavesOnDay->count() - 3 }} more
+                                                    +{{ $leavesOnDay->count() - ($holiday ? 2 : 3) }} more
                                                 </div>
                                             @endif
                                         </div>

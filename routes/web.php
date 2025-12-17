@@ -94,6 +94,10 @@ Route::middleware(['auth', 'verified', 'hr_admin'])->prefix('hr-admin')->name('h
     Route::post('/users', [HRAdminController::class, 'storeUser'])->name('users.store');
     Route::get('/users/{user}/edit', [HRAdminController::class, 'editUser'])->name('users.edit');
     Route::put('/users/{user}', [HRAdminController::class, 'updateUser'])->name('users.update');
+    Route::post('/users/{user}/toggle-status', [HRAdminController::class, 'toggleUserStatus'])->name('users.toggle-status');
+
+    // Delegation tracking
+    Route::get('/delegations', [HRAdminController::class, 'delegations'])->name('delegations');
 
     // Balance management
     Route::get('/balances', [HRAdminController::class, 'balances'])->name('balances');

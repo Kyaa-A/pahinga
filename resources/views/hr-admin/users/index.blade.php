@@ -13,7 +13,7 @@
             {{-- Filters --}}
             <div class="mb-6 overflow-hidden bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg border border-gray-200 dark:border-gray-700">
                 <div class="p-6">
-                    <form method="GET" action="{{ route('hr-admin.users') }}" class="grid grid-cols-1 gap-4 md:grid-cols-4">
+                    <form method="GET" action="{{ route('hr-admin.users') }}" class="grid grid-cols-1 gap-4 md:grid-cols-5">
                         <div>
                             <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Search</label>
                             <input type="text" name="search" id="search" value="{{ request('search') }}"
@@ -38,6 +38,15 @@
                                 @foreach($departments as $dept)
                                     <option value="{{ $dept }}" {{ request('department') === $dept ? 'selected' : '' }}>{{ $dept }}</option>
                                 @endforeach
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+                            <select name="status" id="status" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
+                                <option value="">All Status</option>
+                                <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active</option>
+                                <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
                             </select>
                         </div>
 
@@ -73,6 +82,9 @@
                                 </th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
                                     Leave Balances
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                                    Status
                                 </th>
                                 <th scope="col" class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
                                     Actions
@@ -119,15 +131,32 @@
                                             <span class="text-sm text-gray-500 dark:text-gray-400">-</span>
                                         @endif
                                     </td>
+                                    <td class="whitespace-nowrap px-6 py-4">
+                                        @if($user->is_active ?? true)
+                                            <span class="inline-flex rounded-full bg-green-100 dark:bg-green-900/30 px-2 py-1 text-xs font-semibold text-green-800 dark:text-green-300">Active</span>
+                                        @else
+                                            <span class="inline-flex rounded-full bg-red-100 dark:bg-red-900/30 px-2 py-1 text-xs font-semibold text-red-800 dark:text-red-300">Inactive</span>
+                                        @endif
+                                    </td>
                                     <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                                        <a href="{{ route('hr-admin.users.edit', $user) }}" class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300">
-                                            Edit
-                                        </a>
+                                        <div class="flex items-center justify-end gap-3">
+                                            <a href="{{ route('hr-admin.users.edit', $user) }}" class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300">
+                                                Edit
+                                            </a>
+                                            @if($user->id !== auth()->id())
+                                                <form method="POST" action="{{ route('hr-admin.users.toggle-status', $user) }}" class="inline" onsubmit="return confirm('Are you sure you want to {{ ($user->is_active ?? true) ? 'deactivate' : 'activate' }} this user?');">
+                                                    @csrf
+                                                    <button type="submit" class="{{ ($user->is_active ?? true) ? 'text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300' : 'text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300' }}">
+                                                        {{ ($user->is_active ?? true) ? 'Deactivate' : 'Activate' }}
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        </div>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                                    <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
                                         No users found.
                                     </td>
                                 </tr>

@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Enums\UserRole;
 use App\Models\CompanyHoliday;
 use App\Models\LeaveBalance;
-use App\Models\LeavePolicy;
 use App\Models\LeaveRequest;
+use App\Models\ManagerDelegation;
 use App\Models\User;
 use App\Services\LeaveBalanceService;
 use Illuminate\Http\RedirectResponse;
@@ -89,7 +89,6 @@ class HRAdminController extends Controller
      */
     public function users(Request $request): View
     {
-        
 
         $users = User::with(['leaveBalances', 'manager'])
             ->when($request->filled('role'), function ($query) use ($request) {
@@ -103,6 +102,13 @@ class HRAdminController extends Controller
                     $q->where('name', 'like', '%'.$request->search.'%')
                         ->orWhere('email', 'like', '%'.$request->search.'%');
                 });
+            })
+            ->when($request->filled('status'), function ($query) use ($request) {
+                if ($request->status === 'active') {
+                    $query->whereRaw('is_active = true');
+                } elseif ($request->status === 'inactive') {
+                    $query->whereRaw('is_active = false');
+                }
             })
             ->orderBy('name')
             ->paginate(20);
@@ -135,7 +141,6 @@ class HRAdminController extends Controller
      */
     public function storeUser(Request $request): RedirectResponse
     {
-        
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -202,7 +207,6 @@ class HRAdminController extends Controller
      */
     public function updateUser(Request $request, User $user): RedirectResponse
     {
-        
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -257,7 +261,6 @@ class HRAdminController extends Controller
      */
     public function balances(Request $request): View
     {
-        
 
         $balances = LeaveBalance::with(['user'])
             ->when($request->filled('user_id'), function ($query) use ($request) {
@@ -293,7 +296,6 @@ class HRAdminController extends Controller
      */
     public function updateBalance(Request $request, LeaveBalance $balance): RedirectResponse
     {
-        
 
         $validated = $request->validate([
             'available_days' => 'required|numeric|min:0',
@@ -333,7 +335,6 @@ class HRAdminController extends Controller
      */
     public function holidays(Request $request): View
     {
-        
 
         $holidays = CompanyHoliday::when($request->filled('year'), function ($query) use ($request) {
             $query->whereYear('date', $request->year);
@@ -362,7 +363,6 @@ class HRAdminController extends Controller
      */
     public function storeHoliday(Request $request): RedirectResponse
     {
-        
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -392,7 +392,6 @@ class HRAdminController extends Controller
      */
     public function updateHoliday(Request $request, CompanyHoliday $holiday): RedirectResponse
     {
-        
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -420,11 +419,61 @@ class HRAdminController extends Controller
     }
 
     /**
+     * Display all manager delegations system-wide.
+     */
+    public function delegations(Request $request): View
+    {
+        $delegations = ManagerDelegation::with(['manager', 'delegate'])
+            ->when($request->filled('status'), function ($query) use ($request) {
+                if ($request->status === 'active') {
+                    $query->active()->where('end_date', '>=', now());
+                } elseif ($request->status === 'inactive') {
+                    $query->where(function ($q) {
+                        $q->whereRaw('is_active = false')
+                            ->orWhere('end_date', '<', now());
+                    });
+                }
+            })
+            ->when($request->filled('manager_id'), function ($query) use ($request) {
+                $query->where('manager_id', $request->manager_id);
+            })
+            ->orderByDesc('start_date')
+            ->paginate(20);
+
+        $managers = User::where('role', UserRole::Manager)->orderBy('name')->get();
+
+        return view('hr-admin.delegations', [
+            'delegations' => $delegations,
+            'managers' => $managers,
+        ]);
+    }
+
+    /**
+     * Toggle user active status (deactivate/activate).
+     */
+    public function toggleUserStatus(User $user): RedirectResponse
+    {
+        // Prevent HR admin from deactivating themselves
+        if ($user->id === auth()->id()) {
+            return back()->withErrors(['error' => 'You cannot deactivate your own account.']);
+        }
+
+        $user->update([
+            'is_active' => ! $user->is_active,
+        ]);
+
+        $status = $user->is_active ? 'activated' : 'deactivated';
+
+        return redirect()
+            ->route('hr-admin.users')
+            ->with('success', "User account {$status} successfully!");
+    }
+
+    /**
      * Display company-wide reports.
      */
     public function reports(Request $request): View
     {
-        
 
         $year = $request->filled('year') ? $request->year : now()->year;
 

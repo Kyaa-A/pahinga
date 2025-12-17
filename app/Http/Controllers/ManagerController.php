@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\LeaveStatus;
 use App\Enums\UserRole;
+use App\Models\CompanyHoliday;
 use App\Models\LeaveRequest;
 use App\Models\ManagerDelegation;
 use App\Models\User;
@@ -285,12 +286,19 @@ class ManagerController extends Controller
             $endDate
         );
 
+        // Get holidays for the month
+        $holidays = CompanyHoliday::whereBetween('date', [$startDate, $endDate])
+            ->orderBy('date')
+            ->get()
+            ->keyBy(fn ($holiday) => $holiday->date->format('Y-m-d'));
+
         return view('manager.team-calendar', [
             'leaves' => $leaves,
             'currentMonth' => $startDate,
             'teamSize' => $user->direct_reports_count,
             'dailyAvailability' => $dailyAvailability,
             'monthAvailability' => $monthAvailability,
+            'holidays' => $holidays,
         ]);
     }
 
@@ -438,7 +446,7 @@ class ManagerController extends Controller
 
         // Verify the delegate is actually a manager
         $delegate = User::findOrFail($validated['delegate_manager_id']);
-        if (!$delegate->isManager()) {
+        if (! $delegate->isManager()) {
             return back()->withErrors(['delegate_manager_id' => 'Selected user is not a manager.']);
         }
 

@@ -29,6 +29,9 @@
                         <x-nav-link :href="route('hr-admin.reports')" :active="request()->routeIs('hr-admin.reports')">
                             {{ __('Reports') }}
                         </x-nav-link>
+                        <x-nav-link :href="route('hr-admin.delegations')" :active="request()->routeIs('hr-admin.delegations')">
+                            {{ __('Delegations') }}
+                        </x-nav-link>
                     @elseif (Auth::user()->isManager())
                         <x-nav-link :href="route('manager.dashboard')" :active="request()->routeIs('manager.dashboard')">
                             {{ __('Dashboard') }}
@@ -132,6 +135,9 @@
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('hr-admin.reports')" :active="request()->routeIs('hr-admin.reports')">
                     {{ __('Reports') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('hr-admin.delegations')" :active="request()->routeIs('hr-admin.delegations')">
+                    {{ __('Delegations') }}
                 </x-responsive-nav-link>
             @elseif (Auth::user()->isManager())
                 <x-responsive-nav-link :href="route('manager.dashboard')" :active="request()->routeIs('manager.dashboard')">
